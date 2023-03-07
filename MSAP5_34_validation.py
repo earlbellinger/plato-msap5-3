@@ -86,8 +86,8 @@ def validation(IDP_MASS_SEISMIC=None,
                 ((models['radius'] - R_result[0])/R_result[1])**2 + \
                 ((models['age']    - A_result[0])/A_result[1])**2)/3
         chi2min = chi2.min()
-        print(stats.chi2.pdf(chi2min, 2))
-        if stats.chi2.pdf(chi2min, 2) < 0.01: # reject the null hypothesis
+        pvalue = stats.chi2.pdf(chi2min, 2)
+        if pvalue < 0.01: # reject the null hypothesis
             return fail
     
     # validation: two measurements 
