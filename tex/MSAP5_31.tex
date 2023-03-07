@@ -519,7 +519,7 @@ Case 1
 Case 2
   \begin{itemize}
       \firmlist
-      \item One inconsistent mass measurement. 
+      \item One inconsistent mass measurement. Additionally, in this case, the seismic radius measurement is missing.
       \item Inputs: Defaults, except 1 is added to all the samples from the first mass method
       \item Outputs: [False, True, True]
   \end{itemize}
@@ -527,7 +527,7 @@ Case 2
 Case 3
   \begin{itemize}
       \firmlist
-      \item Two inconsistent radius measurements. 
+      \item Two inconsistent radius measurements. Additionally, in this case, the seismic and granulation mass measurements are missing. 
       \item Inputs: Defaults, except $0.5$ is added to all the samples from the first radius method, and 1 is added to all the samples from the second radius method
       \item Outputs: [True, False, True]
   \end{itemize}
@@ -539,6 +539,14 @@ Case 4
       \item Inputs: Defaults, except $2,4,6$ are added to the first, second, third age methods 
       \item Outputs: [True, True, False]
   \end{itemize}
+
+Case 5
+\begin{itemize}
+    \firmlist
+    \item Consistent but invalid measurements. 
+     \item Inputs: Defaults, except the radii are 10 solar masses larger 
+     \item Outputs: [True, True, True]
+\end{itemize}
 
 \section{Scientific test case(s)}
 \label{sec:test-science}

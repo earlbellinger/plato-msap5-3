@@ -4,19 +4,27 @@
 %%
 %% Templatenauthor: Jakob Lysgaard Rørsted [jakob (at) phys (dot) au (dot) dk]
 %%
-%% Module MSAP3-33
+%% Module MSAP3-31
 %% ============================================================================
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % Preamble
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \documentclass[a4paper, oneside, 11pt, article, english]{memoir}
 
+\usepackage{natbib}
+\bibliographystyle{unsrtnat}
+
+
+%\usepackage{hyperref}
+
+
 % Input standard preamble
 %\input{preamble}
+\input{preamble-Bellinger.tex}
 
 % Information for maketitle
 \author{Earl Patrick Bellinger}
-\newcommand\shorttitle{Documentation of MSAP3-33\xspace}  % For the header
+\newcommand\shorttitle{Documentation of MSAP3-34\xspace}  % For the header
 \title{\shorttitle{} for PLATO \\ \Large\textit{Validation}}
 \date{\today}
 
@@ -83,13 +91,15 @@
 \section{Scope of the document}
 \label{sec:scope}
 
-This document aims to provide a description of the consistency checking algorithm for the selection and validation module of the MSAP5. It
-provides technical details (inputs, outputs, data types) as well as the
-functional description (implementation) for the L1/L2 stellar pipeline. The
+This document aims to provide a description of the validation algorithm for the selection and validation module of the MSAP5. 
+It provides technical details (inputs, outputs, data types) as well as the
+functional description (implementation). The
 justification for the choice of this specific algorithm and a description of its
 scientific performances is provided in [please provide the reference of the
 justification document]. Moreover, the exact position of this algorithm within
-the data processing pipeline is described in [RD1]. % TODO
+the data processing pipeline is described in [RD1]. 
+
+\textbf{TODO -- Andrea, can you help here?}
 
 
 \section{Nomenclature}
@@ -99,7 +109,7 @@ the data processing pipeline is described in [RD1]. % TODO
 %\emph{Please provide in the table, the definition of the technical terms when
 %undefined in the text.}
 
-See \cref{tab:nomenclature} and \cref{tab:datatypes}.
+See \ref{tab:nomenclature} and \ref{tab:datatypes}.
 
 % Table with nomenclature
 \begin{table}[htbp]
@@ -110,6 +120,11 @@ See \cref{tab:nomenclature} and \cref{tab:datatypes}.
     \toprule
     Term                & Description                                                                                                                                                                                                                                                                                                                                                     \\
     \midrule
+    M & mass of the star in units of the solar mass M$_\odot$ \\
+%  \item[M$_\odot$] solar mass
+    R & radius of the star in units of the solar radius R$_\odot$ \\
+%  \item[M$_\odot$] solar radius
+    A & age of the star in units of Gyr \\
     %Baseline algorithms & initial, minimum set of algorithms needed to perform the essential scientific analysis tasks of the EAS or SAS pipelines. As they are the 'initial' (or 'baseline') set of algorithms, they could be updated later on. By 'essential' scientific analysis we mean the analysis / data processing that is necessary for fulfilling the scientific goals of PLATO.\\
     %Legacy code         & it is defined as a code that has been previously developed, used, and validated in contexts other than PLATO. To be used in the PLATO framework, it must be well-documented, extensively tested, and too heavy to be implemented from scratch by the PDC.                                                                                                       \\
     %Prototype           & preliminary software that can help testing the algorithm, specially input and output data                                                                                                                                                                                                                                                                       \\
@@ -129,6 +144,8 @@ See \cref{tab:nomenclature} and \cref{tab:datatypes}.
       \toprule
       Type             & Size               & Values                                          \\
       \midrule
+      array & arbitrary & floats \\
+      %
       %bool             & 1 bit              & 0 (false) 1 (true)                              \\
       %enumeration      &                    & Label 1 = value 1, Label 2 = value 2, ...       \\
       %signed byte      & 8 bits             & {[}-128, 127{]}                                 \\
@@ -156,10 +173,14 @@ See \cref{tab:nomenclature} and \cref{tab:datatypes}.
 \section{Referenced documents}
 \label{sec:docs}
 
+MSAP3-31\\
+MSAP3-32
 % TEXT FROM TEMPLATE BELOW IN emph OR itshape
 %\emph{To be adapted and completed}
 
-The following documents are referenced:
+%The following documents are referenced:
+
+%\textbf{TODO -- Andrea, can you help here?}
 
 \begin{description}
   \firmlist
@@ -178,6 +199,9 @@ The following documents are referenced:
 
 \begin{description}
   \firmlist
+  %\item[HSD] Tukey's Honestly Significantly Different statistical test
+%  \item[IDP] Intermediate Data Product
+%  \item[Gyr] one billion years
 %\item[ATBD] Algorithm Theoretical Baseline Document
 %\item[DO-SAPP] During Operation Stellar Abundances and atmospheric Parameters Pipeline DP Data Product
 %\item[EAS] Exoplanet Analysis System
@@ -186,7 +210,7 @@ The following documents are referenced:
 %\item[GO] Guest Observer
 %\item[GOP] Ground-based Observation Program
 %\item[LC] light curve
-\item[PLATO] PLAnetary Transits and Oscillations of Stars
+%\item[PLATO] PLAnetary Transits and Oscillations of Stars
 %\item[PDC] PLATO Data Centre
 %\item[PDC-DB] PDC-Database
 %\item[PIC] PLATO Input Catalogue
@@ -212,6 +236,9 @@ The following documents are referenced:
 
 \section{Name of the algorithm and status}
 \label{sec:name}
+The algorithm is MSAP5-34, \emph{Validation}. 
+The baseline algorithm has been implemented, but revisions are expected. 
+In particular, this algorithm currently works with the publically available MIST stellar tracks \citep{MIST-I, MIST-II}, but needs to be updated to use the official stellar models used in the PLATO mission. 
 
 % TEXT FROM TEMPLATE BELOW IN emph OR itshape
 %\emph{The name of the algorithm should follow the convention defined in the SAS
@@ -224,6 +251,12 @@ The following documents are referenced:
 \section{Synopsis}
 \label{sec:synopsis}
 
+The objective of MSAP5-34 is to validate the selected values of mass (M), radius (R), and age (A). 
+In particular, we check whether these values are physically consistent with stellar models. 
+We achieve this with a $\chi^2$ statistical test in which we reject the null hypothesis at a significance level of $0.01$. 
+If the validation check succeeds (i.e., we fail to reject the null hypothesis), then we return the mean, standard deviation, and source of each measurement. 
+
+
 % TEXT FROM TEMPLATE BELOW IN emph OR itshape
 %\emph{Please provide a short description of the algorithm objective(s)}
 
@@ -233,6 +266,21 @@ The following documents are referenced:
 
 \section{Model}
 \label{sec:model}
+
+We find the model in the grid with the smallest $\chi^2$, defined as:
+\begin{equation}
+    \chi^2 
+    = 
+    \frac{(M - \hat{M})^2}{\sigma_M^2}
+    +
+    \frac{(R - \hat{R})^2}{\sigma_R^2}
+    +
+    \frac{(A - \hat{A})^2}{\sigma_A^2}.
+\end{equation}
+Here $M, R, A$ are the mean values of the selected measurements provided by MSAP5-32; $\sigma_M, \sigma_R, \sigma_A$ are their standard deviations; and $\hat{M}, \hat{R}, \hat{A}$ are the theoretical values from the grid of models. 
+We then use \texttt{scipy 1.10.1} to compute the $\chi^2$ test statistic. 
+
+
 
 % TEXT FROM TEMPLATE BELOW IN emph OR itshape
 %\emph{Please provide here a short description of the main steps of the algorithm}
@@ -248,13 +296,18 @@ The following documents are referenced:
 \section{Complete list of inputs}
 \label{sec:input}
 
+See documentation for MSAP5-31. 
+
+\iffalse
+The inputs are tabulated in Table~\ref{tab:input}. 
+
+\iffalse
 % TEXT FROM TEMPLATE BELOW IN emph OR itshape
 {
   \itshape
   %A comprehensive list of inputs must be provided in the table. For each input,
   %the following information is needed
 
-\iffalse
   \begin{description}
     \firmlist
   \item[Name] the name must follow the nomenclature as defined by WP120 Data
@@ -274,15 +327,35 @@ The following documents are referenced:
   \centering
   \caption{Input parameters}
   \label{tab:input}
-  \begin{tabular}{cccccc}
+  \begin{tabular}{lccccc}
     \toprule
     Name & Source & Status & Data type & Dimension & Unit \\
     \midrule
-    x & x & mandatory/optional & x & x & x \\
+    \iffalse
+    %x & x & mandatory/optional & x & x & x \\
+    IDP\_MASS   & IDP\_124/125 & optional & list of lists & arbitrary & M$_\odot$ \\
+    IDP\_RADIUS & IDP\_124/125 & optional & list of lists & arbitrary & R$_\odot$ \\
+    IDP\_AGE    & IDP\_124/125 & optional & list of lists & arbitrary & Gyr \\
+    %\iffalse%
+    \fi
+    IDP\_MASS\_SEISMIC              & IDP\_124 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_MASS\_GRANULATION          & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_MASS\_GRANULATION\_CGBM    & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_MASS\_RHO\_TRANSIT\_CGBM   & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\ \midrule
+    IDP\_RADIUS\_SEISMIC            & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\ 
+    IDP\_RADIUS\_GRANULATION\_CGBM  & IDP\_125 & optional & array & arbitrary & R$_\odot$ \\
+    IDP\_RADIUS\_RHO\_TRANSIT       & IDP\_125 & optional & array & arbitrary & R$_\odot$ \\ 
+    IDP\_RADIUS\_RHO\_TRANSIT\_CGBM & IDP\_125 & optional & array & arbitrary & R$_\odot$ \\ \midrule
+    IDP\_AGE\_SEISMIC               & IDP\_124 & optional & array & arbitrary & Gyr \\ 
+    IDP\_AGE\_GYRO                  & IDP\_125 & optional & array & arbitrary & Gyr \\
+    IDP\_AGE\_ACTIVITY              & IDP\_125 & optional & array & arbitrary & Gyr \\
+    IDP\_AGE\_GRANULATION\_CGBM     & IDP\_125 & optional & array & arbitrary & Gyr \\
+    IDP\_AGE\_RHO\_TRANSIT\_CGBM    & IDP\_125 & optional & array & arbitrary & Gyr \\ 
+    %\fi
     \bottomrule
   \end{tabular}
 \end{table}
-
+\fi
 
 \section{Complete list of outputs}
 \label{sec:output}
@@ -310,11 +383,20 @@ The following documents are referenced:
   \centering
   \caption{Output parameters}
   \label{tab:output}
-  \begin{tabular}{ccccc}
+  \begin{tabular}{lcccc}
     \toprule
     Name & Status & Data type & Dimension & Unit \\
     \midrule
-    x & mandatory/optional & x & x & x \\
+    %x & mandatory/optional & x & x & x \\
+    DP5\_125\_MASS & mandatory & float & 0 & M$_\odot$ \\
+    DP5\_125\_MASS\_STD & mandatory & float & 0 & M$_\odot$ \\
+    DP5\_125\_MASS\_METADATA & mandatory & string & 1 & N/A \\
+    DP5\_125\_RADIUS & mandatory & float & 0 & R$_\odot$ \\
+    DP5\_125\_RADIUS\_STD & mandatory & float & 0 & R$_\odot$ \\
+    DP5\_125\_RADIUS\_METADATA & mandatory & string & 1 & N/A \\
+    DP5\_125\_AGE & mandatory & float & 0 & Gyr \\
+    DP5\_125\_AGE\_STD & mandatory & float & 0 & Gyr \\
+    DP5\_125\_AGE\_METADATA & mandatory & string & 1 & N/A \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -359,7 +441,8 @@ Prototype
 \section{Algorithm maturity}
 \label{sec:mature}
 
-Algorithm concept defined, but interfaces (inputs/outputs) unstable
+Algorithm concept defined, but interfaces (inputs/outputs) unstable. 
+Has been tested with randomly-generated pseudo inputs, but needs to be tested with actual inputs from all of the PLATO modules. 
 
 % TEXT FROM TEMPLATE BELOW IN emph OR itshape
 \iffalse
@@ -385,7 +468,7 @@ Algorithm concept defined, but interfaces (inputs/outputs) unstable
 \section{Algorithm source}
 \label{sec:source}
 
-TODO
+The implemented algorithm and test cases are shipped directly to WP12 office alongside this document as a compressed archive.
 
 % TEXT FROM TEMPLATE BELOW IN emph OR itshape
 %\emph{If you provide either a prototype or legacy code: link to the source (you
@@ -433,29 +516,72 @@ N/A
 {
   \itshape
 
-  Test cases are necessary for the technical validation of the implementation
-  by the PDC . Given input(s) you provide, the PDC will test if it obtains
-  exactly the same output(s). One or several technical reference test(s) shall
-  be provided to allow the PDC for checking the implementation for the different
-  configurations of the algorithm. For each test case, the following must be
-  provided:
-
-  \begin{itemize}
-    \firmlist
-  \item A short definition of the test.
-  \item values of the inputs. Please provide a link or send the data to the WP12 office.
-  \item values of the outputs. Please provide a link or send the data to the WP12 office.
-  \end{itemize}
+%  Test cases are necessary for the technical validation of the implementation
+%  by the PDC . Given input(s) you provide, the PDC will test if it obtains
+%  exactly the same output(s). One or several technical reference test(s) shall
+%  be provided to allow the PDC for checking the implementation for the different
+%  configurations of the algorithm. For each test case, the following must be
+%  provided:
 }
 
+
+The test cases are the same as MSAP5\_31 and MSAP5\_32.  These tests are run in \texttt{MSAP5-34-validation.ipynb}. 
+
+Case 1
+  \begin{itemize}
+      \firmlist
+      \item All consistent measurements. 
+      \item Inputs: Defaults
+      \item Outputs: [(0.9962651773334784, 0.03987402416784018, 'IDP\_MASS\_SEISMIC'), (1.0005801453727239, 0.010773401555852083, 'IDP\_RADIUS\_SEISMIC'), (4.523488989174997, 0.4577944489853377, 'IDP\_AGE\_SEISMIC')]
+  \end{itemize}
+
+Case 2
+  \begin{itemize}
+      \firmlist
+      \item One inconsistent mass measurement. Additionally, in this case, the seismic radius measurement is missing.
+      \item Inputs: Defaults, except 1 is added to all the samples from the first mass method
+      \item Outputs: [None, \\
+                      (1.0001027661859054, 0.010833272851737678, 'IDP\_RADIUS\_GRANULATION\_CGBM'), \\(4.523488989174997, 0.4577944489853377, 'IDP\_AGE\_SEISMIC')]
+  \end{itemize}
+
+Case 3
+  \begin{itemize}
+      \firmlist
+      \item Two inconsistent radius measurements. Additionally, in this case, the seismic and granulation mass measurements are missing. 
+      \item Inputs: Defaults, except $0.5$ is added to all the samples from the first radius method, and 1 is added to all the samples from the second radius method
+      \item Outputs: [(1.0019919549716714, 0.04171507064562778, 'IDP\_MASS\_GRANULATION\_CGBM'), \\
+                      None, \\
+                      (4.523488989174997, 0.4577944489853377, 'IDP\_AGE\_SEISMIC')]
+  \end{itemize}
+
+Case 4
+  \begin{itemize}
+      \firmlist
+      \item Three inconsistent age measurements. 
+      \item Inputs: Defaults, except $2,4,6$ are added to the first, second, third age methods 
+      \item Outputs: [(0.9962651773334784, 0.03987402416784018, 'IDP\_MASS\_SEISMIC'), \\
+                      (1.0005801453727239, 0.010773401555852083, 'IDP\_RADIUS\_SEISMIC'), \\
+                      None]
+  \end{itemize}
+
+Case 5
+\begin{itemize}
+    \firmlist
+    \item Consistent but invalid measurements. 
+     \item Inputs: Defaults, except the radii are 10 solar masses larger 
+     \item Outputs: [None, None, None]
+\end{itemize}
 
 \section{Scientific test case(s)}
 \label{sec:test-science}
 
-% TEXT FROM TEMPLATE BELOW IN emph OR itshape
-\emph{Please specify here and describe if you need or will need simulated data
-  to be produced or provided by the WP12 office for the scientific validation of
-  the performances of thee algorithm.}
+Simulated data would be highly valuable in testing the algorithm. 
 
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+%\emph{Please specify here and describe if you need or will need simulated data
+%  to be produced or provided by the WP12 office for the scientific validation of
+%  the performances of thee algorithm.}
+
+\bibliography{references}
 
 \end{document}

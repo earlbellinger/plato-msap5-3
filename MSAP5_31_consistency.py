@@ -50,13 +50,17 @@ def consistency(IDP_MASS_SEISMIC=None,
           IDP_AGE_RHO_TRANSIT_CGBM]
     
     # remove measurements that are None 
-    Ms = [M for M in Ms if M is not None]
-    Rs = [R for R in Rs if R is not None]
-    As = [A for A in As if A is not None]
+    Ms = [M for M in Ms if M is not None and len(M)>1]
+    Rs = [R for R in Rs if R is not None and len(R)>1]
+    As = [A for A in As if A is not None and len(A)>1]
+    
+    #print(Rs)
     
     flags = []
     for xs in [Ms, Rs, As]:
         #print(1)
+        
+        #print(xs)
         
         # case: no measurements (all None)
         if xs == []:
