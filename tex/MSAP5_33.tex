@@ -1,0 +1,461 @@
+%% ============================================================================
+%%
+%% PLATO MSAP5 documentation
+%%
+%% Templatenauthor: Jakob Lysgaard Rørsted [jakob (at) phys (dot) au (dot) dk]
+%%
+%% Module MSAP3-33
+%% ============================================================================
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Preamble
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\documentclass[a4paper, oneside, 11pt, article, english]{memoir}
+
+% Input standard preamble
+%\input{preamble}
+
+% Information for maketitle
+\author{Earl Patrick Bellinger}
+\newcommand\shorttitle{Documentation of MSAP3-33\xspace}  % For the header
+\title{\shorttitle{} for PLATO \\ \Large\textit{Validation}}
+\date{\today}
+
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Content
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{document}
+\maketitle
+
+% Introductionary tables I: Author(s)
+\begin{table}[htbp]
+  \centering
+  \caption{Author information}
+  \label{tab:author}
+  \begin{tabular}{cc}
+    \toprule
+    Prepared by & Date\\
+    \midrule
+    Earl P. Bellinger & March 4, 2023 \\
+    \\
+    Checked by \\
+    \midrule
+    \\
+    Approved by \\
+    \midrule
+    \\
+    Authorized by \\
+    \midrule
+    \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% Introductionary tables II: Version
+\begin{table}[htbp]
+  \centering
+  \caption{Version history}
+  \label{tab:version}
+  \begin{tabular}{ccccc}
+    \toprule
+    Issue & Date & \textnumero{} change description & Page(s) & Paragraph(s) \\
+    \midrule
+    1.0 & March 4, 2023 & Initial release & All & All \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Table of contents
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\clearpage
+\tableofcontents*
+\clearpage
+
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Introduction
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\chapter{Introduction}
+\label{chap:intro}
+
+\section{Scope of the document}
+\label{sec:scope}
+
+This document aims to provide a description of the consistency checking algorithm for the selection and validation module of the MSAP5. It
+provides technical details (inputs, outputs, data types) as well as the
+functional description (implementation) for the L1/L2 stellar pipeline. The
+justification for the choice of this specific algorithm and a description of its
+scientific performances is provided in [please provide the reference of the
+justification document]. Moreover, the exact position of this algorithm within
+the data processing pipeline is described in [RD1]. % TODO
+
+
+\section{Nomenclature}
+\label{sec:nomenclature}
+
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+%\emph{Please provide in the table, the definition of the technical terms when
+%undefined in the text.}
+
+See \cref{tab:nomenclature} and \cref{tab:datatypes}.
+
+% Table with nomenclature
+\begin{table}[htbp]
+  \centering
+  \caption{Nomenclature}
+  \label{tab:nomenclature}
+  \begin{tabular}{@{}lp{9cm}@{}}
+    \toprule
+    Term                & Description                                                                                                                                                                                                                                                                                                                                                     \\
+    \midrule
+    %Baseline algorithms & initial, minimum set of algorithms needed to perform the essential scientific analysis tasks of the EAS or SAS pipelines. As they are the 'initial' (or 'baseline') set of algorithms, they could be updated later on. By 'essential' scientific analysis we mean the analysis / data processing that is necessary for fulfilling the scientific goals of PLATO.\\
+    %Legacy code         & it is defined as a code that has been previously developed, used, and validated in contexts other than PLATO. To be used in the PLATO framework, it must be well-documented, extensively tested, and too heavy to be implemented from scratch by the PDC.                                                                                                       \\
+    %Prototype           & preliminary software that can help testing the algorithm, specially input and output data                                                                                                                                                                                                                                                                       \\
+    %Pseudo-code         & a schematic description of the algorithm or code written in a simplified language                                                                                                                                                                                                                                                                               \\
+    %{[}tbc{]}           & {[}tbc{]}                                                                                                                                                                                                                                                                                                                                                       \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% Table with data types
+\begin{table}[htbp]
+  \centering
+  \caption{Standard data types}
+  \label{tab:datatypes}
+  \begin{threeparttable}
+    \begin{tabular}{@{}lll@{}}
+      \toprule
+      Type             & Size               & Values                                          \\
+      \midrule
+      %bool             & 1 bit              & 0 (false) 1 (true)                              \\
+      %enumeration      &                    & Label 1 = value 1, Label 2 = value 2, ...       \\
+      %signed byte      & 8 bits             & {[}-128, 127{]}                                 \\
+      %signed short     & 16 bits            & {[}–32768, 32767{]}                             \\
+      %signed int       & 32 bits            & {[}-2147483648, 2147483647{]}                   \\
+      %signed long      & 64 bits            & {[}–9223372036854775808, 9223372036854775807{]} \\
+      %unsigned byte    & 8 bits             & {[}0,255{]}                                     \\
+      %unsigned short   & 16 bits            & {[}0,65535{]}                                   \\
+      %unsigned int     & 32 bits            & {[}0,4294967295{]}                              \\
+      %unsigned long    & 64 bits            & {[}0,18446744073709551615{]}                    \\
+      %float\tnote{a}   & 32 bits            & 3.4E +/- 38 (7 digits)                          \\
+      %double\tnote{b}  & 64 bits            & 1.7E +/-308 (15 digits)                         \\
+      %string           & 128 char\tnote{c}  &                                                 \\
+      \bottomrule
+    \end{tabular}
+    \begin{tablenotes}
+    %\item[a:] float with single precision
+    %\item[b:] float with double precision
+    %\item[c:] 1 char = 1 byte
+    \end{tablenotes}
+  \end{threeparttable}
+\end{table}
+
+
+\section{Referenced documents}
+\label{sec:docs}
+
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+%\emph{To be adapted and completed}
+
+The following documents are referenced:
+
+\begin{description}
+  \firmlist
+%\item[RD1] PLATO-LESIA-PSPM-DD-0021, Work and data flows of the stellar L1/L2 processing pipeline
+%\item[RD2] PLATO-MPSSR-PMC-SIP-0001, Plato mission consortium science ground segment science implementation plan
+%\item[RD3] PLATO-LESIA-PSPM-DRD-0007, Data product description document of the stellar L1/L2 processing pipeline
+%\item[RD4] tbc
+\end{description}
+
+
+\section{Abbreviations}
+\label{sec:abbrev}
+
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+%\emph{To be adapted and completed}
+
+\begin{description}
+  \firmlist
+%\item[ATBD] Algorithm Theoretical Baseline Document
+%\item[DO-SAPP] During Operation Stellar Abundances and atmospheric Parameters Pipeline DP Data Product
+%\item[EAS] Exoplanet Analysis System
+%\item[ESA] European Space Agency
+%\item[FU] follow-up
+%\item[GO] Guest Observer
+%\item[GOP] Ground-based Observation Program
+%\item[LC] light curve
+\item[PLATO] PLAnetary Transits and Oscillations of Stars
+%\item[PDC] PLATO Data Centre
+%\item[PDC-DB] PDC-Database
+%\item[PIC] PLATO Input Catalogue
+%\item[PMC] PLATO Mission Consortium ppm parts per million
+%\item[PSM] PLATO Science Management
+%\item[SAS] Stellar Analysis System
+%\item[SNR] Signal-to-Noise Ratio
+%\item[TBC] To Be Confirmed
+%\item[TBD] To Be Defined
+%\item[TBS] To Be Specified
+%\item[TBW] To Be Written
+%\item[URD] User Requirements Document
+%\item[URJD] User Requirements Justification Document
+\end{description}
+
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Overview
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\clearpage
+\chapter{General overview}
+\label{chap:overview}
+
+\section{Name of the algorithm and status}
+\label{sec:name}
+
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+%\emph{The name of the algorithm should follow the convention defined in the SAS
+%architecture document {RD1}}
+
+%\emph{Please specify if the algorithm is part of the baseline and if it is expected
+%to be a first version intended to be updated or likely to be the final one.}
+
+
+\section{Synopsis}
+\label{sec:synopsis}
+
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+%\emph{Please provide a short description of the algorithm objective(s)}
+
+%\emph{Please provide the reference to the technical note that justifies the selection
+%of the algorithm. The later shall be sent in a separate document to WP12.}
+
+
+\section{Model}
+\label{sec:model}
+
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+%\emph{Please provide here a short description of the main steps of the algorithm}
+
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Input / output
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\clearpage
+\chapter{Lists of inputs and outputs}
+\label{chap:inputoutput}
+
+\section{Complete list of inputs}
+\label{sec:input}
+
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+{
+  \itshape
+  %A comprehensive list of inputs must be provided in the table. For each input,
+  %the following information is needed
+
+\iffalse
+  \begin{description}
+    \firmlist
+  \item[Name] the name must follow the nomenclature as defined by WP120 Data
+    Products Definition Document [RD3].
+  \item[Source] module or sub-module from which the data is generated (e.g.,
+    database, or previous module/sub-module output parameter). Also specify if the
+    data originates from the current quarter (default) or from a previous quarter.
+  \item[Status] specify if this data is \emph{mandatory} or \emph{optional} to run the algorithm.
+  \item[Data type] see \cref{sec:nomenclature} for the standard definitions
+  \item[Dimension] specify the dimension of the data (e.g; the dimension of a scalar is 0, of an array 1, etc).
+  \item[Unit] provide the unit of the data and the data-system of units (cgs or mks).
+  \end{description}
+}
+\fi
+
+\begin{table}[htbp]
+  \centering
+  \caption{Input parameters}
+  \label{tab:input}
+  \begin{tabular}{cccccc}
+    \toprule
+    Name & Source & Status & Data type & Dimension & Unit \\
+    \midrule
+    x & x & mandatory/optional & x & x & x \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+\section{Complete list of outputs}
+\label{sec:output}
+
+\iffalse
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+{
+  \itshape
+  A comprehensive list of outputs must be provided in the table. For each output,
+  the following information is needed
+
+  \begin{description}
+    \firmlist
+  \item[Name] the name must follow the nomenclature as defined by WP120 Data
+    Products Definition Document [RD3].
+  \item[Status] specify if this data is \emph{mandatory} or \emph{optional} to run the algorithm.
+  \item[Data type] see \cref{sec:nomenclature} for the standard definitions
+  \item[Dimension] specify the dimension of the data (e.g; the dimension of a scalar is 0, of an array 1, etc).
+  \item[Unit] provide the unit of the data and the data-system of units (cgs or mks).
+  \end{description}
+}
+\fi
+
+\begin{table}[htbp]
+  \centering
+  \caption{Output parameters}
+  \label{tab:output}
+  \begin{tabular}{ccccc}
+    \toprule
+    Name & Status & Data type & Dimension & Unit \\
+    \midrule
+    x & mandatory/optional & x & x & x \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Processing description
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\clearpage
+\chapter{Processing description}
+\label{chap:processing}
+
+\section{Type of delivery}
+\label{sec:delivery}
+
+Prototype
+
+\iffalse
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+{
+  \itshape
+
+  The algorithms which are specified for the pipeline can come in different
+  shapes and forms. We expect that the specifications will be delivered to the
+  PDC under different forms, accordingly. Please indicate which one applies to
+  the specified algorithm:
+
+  \begin{itemize}
+    \firmlist
+  \item a legacy code. In that case, please contact WP12 office because some
+    quality requirements are needed.
+  \item a prototype. In that case, and in the first version of this document, no
+    pseudo-code is to be provided.
+  \item a pseudo-code. If no prototype exists, a workflow describing the
+    algorithm main steps and a detailed pseudo-code is needed for
+    implementation.
+  \end{itemize}
+}
+\fi
+
+
+\section{Algorithm maturity}
+\label{sec:mature}
+
+Algorithm concept defined, but interfaces (inputs/outputs) unstable
+
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+\iffalse
+{
+  \itshape
+
+  Please specify the maturity level of the algorithm and do not hesitate to
+  provide any further information on the current status of the algorithm. The
+  convention for algorithm maturity is defined as:
+
+  \begin{itemize}
+    \firmlist
+  \item algorithm not defined
+  \item algorithm concept defined, but interfaces (inputs/outputs) unstable
+  \item algorithm concept defined and interfaces (inputs/outputs) stable, but
+    not all processing steps stable
+  \item no change or only minor changes expected
+  \end{itemize}
+
+}
+\fi
+
+\section{Algorithm source}
+\label{sec:source}
+
+TODO
+
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+%\emph{If you provide either a prototype or legacy code: link to the source (you
+%  can also send the source files directly to the WP12 office) and any useful
+%  information for running the code}
+
+
+\section{Pseudo-code}
+\label{sec:pseudo}
+
+N/A
+
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+%\emph{If no prototype or legacy code is provided, a pseudo-code is needed.
+%  The level of detail should should be high enough to allow for the
+%  implementation by the PDC}
+
+
+\section{Flow diagram}
+\label{sec:flowchart}
+
+N/A
+
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+%\emph{Depending of the complexity of the algorithm, a flow diagram could be
+%  useful for implementation. If the algorithm comprises several steps and
+%  iterative processes, please provide such a diagram. It is expected to show
+%  inputs, outputs and processing steps, including decisions and parallel
+%  processing branches, if applicable.}
+
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Testing
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\clearpage
+\chapter{Test case(s)}
+\label{chap:tests}
+
+
+\section{Implementation test case(s)}
+\label{sec:test-implement}
+
+
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+{
+  \itshape
+
+  Test cases are necessary for the technical validation of the implementation
+  by the PDC . Given input(s) you provide, the PDC will test if it obtains
+  exactly the same output(s). One or several technical reference test(s) shall
+  be provided to allow the PDC for checking the implementation for the different
+  configurations of the algorithm. For each test case, the following must be
+  provided:
+
+  \begin{itemize}
+    \firmlist
+  \item A short definition of the test.
+  \item values of the inputs. Please provide a link or send the data to the WP12 office.
+  \item values of the outputs. Please provide a link or send the data to the WP12 office.
+  \end{itemize}
+}
+
+
+\section{Scientific test case(s)}
+\label{sec:test-science}
+
+% TEXT FROM TEMPLATE BELOW IN emph OR itshape
+\emph{Please specify here and describe if you need or will need simulated data
+  to be produced or provided by the WP12 office for the scientific validation of
+  the performances of thee algorithm.}
+
+
+\end{document}
