@@ -13,6 +13,7 @@
 
 \usepackage{natbib}
 \bibliographystyle{unsrtnat}
+\usepackage{threeparttable}
 
 
 %\usepackage{hyperref}
@@ -48,6 +49,7 @@
     \\
     Checked by \\
     \midrule
+    %Andrea Miglio & April 3, 2023?
     \\
     Approved by \\
     \midrule
@@ -93,13 +95,11 @@
 
 This document aims to provide a description of the consistency checking algorithm for the selection and validation module of the MSAP5. It
 provides technical details (inputs, outputs, data types) as well as the
-functional description (implementation). The
-justification for the choice of this specific algorithm and a description of its
-scientific performances is provided in [please provide the reference of the
-justification document]. Moreover, the exact position of this algorithm within
+functional description (implementation). 
+%The justification for the choice of this specific algorithm and a description of its scientific performances is provided in [please provide the reference of the justification document]. 
+%Moreover, 
+The position of this algorithm within
 the data processing pipeline is described in [RD1]. 
-
-\textbf{TODO -- Andrea, can you help here?}
 
 
 \section{Nomenclature}
@@ -178,11 +178,9 @@ See \ref{tab:nomenclature} and \ref{tab:datatypes}.
 
 The following documents are referenced:
 
-\textbf{TODO -- Andrea, can you help here?}
-
 \begin{description}
   \firmlist
-%\item[RD1] PLATO-LESIA-PSPM-DD-0021, Work and data flows of the stellar L1/L2 processing pipeline
+\item[RD1] PLATO-LESIA-PSPM-DD-0021, Work and data flows of the stellar L1/L2 processing pipeline
 %\item[RD2] PLATO-MPSSR-PMC-SIP-0001, Plato mission consortium science ground segment science implementation plan
 %\item[RD3] PLATO-LESIA-PSPM-DRD-0007, Data product description document of the stellar L1/L2 processing pipeline
 %\item[RD4] tbc
@@ -332,7 +330,6 @@ The inputs are tabulated in Table~\ref{tab:input}.
     IDP\_MASS\_RHO\_TRANSIT\_CGBM   & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\ \midrule
     IDP\_RADIUS\_SEISMIC            & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\ 
     IDP\_RADIUS\_GRANULATION\_CGBM  & IDP\_125 & optional & array & arbitrary & R$_\odot$ \\
-    IDP\_RADIUS\_RHO\_TRANSIT       & IDP\_125 & optional & array & arbitrary & R$_\odot$ \\ 
     IDP\_RADIUS\_RHO\_TRANSIT\_CGBM & IDP\_125 & optional & array & arbitrary & R$_\odot$ \\ \midrule
     IDP\_AGE\_SEISMIC               & IDP\_124 & optional & array & arbitrary & Gyr \\ 
     IDP\_AGE\_GYRO                  & IDP\_125 & optional & array & arbitrary & Gyr \\
