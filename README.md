@@ -10,3 +10,5 @@ Tests are in jupyter notebooks:
 - [MSAP5-31-consistency.ipynb](MSAP5-31-consistency.ipynb)
 - [MSAP5-32-selection.ipynb](MSAP5-32-selection.ipynb)
 - [MSAP5-34-validation.ipynb](MSAP5-34-validation.ipynb)
+
+The documentation can be found on [Overleaf](https://www.overleaf.com/read/fjxkpftbgrzp#9bf7d5). 
