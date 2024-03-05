@@ -1,75 +1,91 @@
 #!usr/bin/env python 
 #### PLATO MSAP5-34 Validation
-#### Author: Earl Patrick Bellinger ( bellinger@phys.au.dk ) 
-#### Max Planck Institute for Astrophysics, Garching, Germany 
-#### Stellar Astrophysics Centre, Aarhus, Denmark 
+#### Author: Earl Patrick Bellinger ( earl.bellinger@yale.edu ) 
+#### Department of Astronomy, Yale University
 
 import numpy as np
 import pandas as pd
 from scipy import stats
-from MSAP5_32_selection import selection, M_names, R_names, A_names
+from MSAP5 import M_names, R_names, A_names
 
 models = pd.read_csv('MIST-models.csv')
 
-def validation(IDP_MASS_SEISMIC=None, 
-               IDP_MASS_GRANULATION=None, 
-               IDP_MASS_GRANULATION_CGBM=None, 
-               IDP_MASS_RHO_TRANSIT_CGBM=None, 
-               IDP_RADIUS_SEISMIC=None, 
-               IDP_RADIUS_GRANULATION_CGBM=None, 
-               IDP_RADIUS_RHO_TRANSIT=None, 
-               IDP_RADIUS_RHO_TRANSIT_CGBM=None, 
-               IDP_AGE_SEISMIC=None, 
-               IDP_AGE_GYRO=None, 
-               IDP_AGE_ACTIVITY=None, 
-               IDP_AGE_GRANULATION_CGBM=None, 
-               IDP_AGE_RHO_TRANSIT_CGBM=None):
+def validation(IDP_SAS_MASS_GRID_MIXED=None, 
+               IDP_SAS_MASS_GRID_SURF_IND=None, 
+               IDP_SAS_MASS_FREQS=None, 
+               IDP_SAS_MASS_SCALING_GRIDS=None, 
+               IDP_SAS_MASS_SCALING_ONLY=None, 
+               IDP_SAS_MASS_GRANULATION=None, 
+               IDP_SAS_MASS_GRANULATION_CGBM=None, 
+               IDP_SAS_RADIUS_GRID_MIXED=None, 
+               IDP_SAS_RADIUS_GRID_SURF_IND=None, 
+               IDP_SAS_RADIUS_FREQS=None, 
+               IDP_SAS_RADIUS_SCALING_GRIDS=None, 
+               IDP_SAS_RADIUS_SCALING_ONLY=None, 
+               IDP_SAS_RADIUS_GRANULATION_CGBM=None, 
+               IDP_SAS_AGE_GRID_MIXED=None, 
+               IDP_SAS_AGE_GRID_SURF_IND=None, 
+               IDP_SAS_AGE_FREQS=None, 
+               IDP_SAS_AGE_SCALING_GRIDS=None, 
+               IDP_SAS_AGE_GYRO=None, 
+               IDP_SAS_AGE_ACTIVITY=None, 
+               IDP_SAS_AGE_GRANULATION_CGBM=None,
+               IDP_SAS_MASS_PRIORITY=None,
+               IDP_SAS_RADIUS_PRIORITY=None,
+               IDP_SAS_AGE_PRIORITY=None):
     """
     Validates the selected combination of mass, radius, and age against a set of theoretical models.
     
     Parameters
     ----------
-    IDP_MASS_... : array
-    	Samples from the posterior mass distribution from each method supplied, in solar units 
-    IDP_RADIUS_... : array
-    	Samples from the posterior radius distribution from each method supplied, in solar units 
-    IDP_AGE_... : array
-    	Samples from the posterior age distribution from each method supplied, in Gyr 
+    IDP_SAS_... : array
+        Samples from the posterior distribution from each method supplied, in respective units (mass in solar units, radius in solar units, age in Gyr)
     """
-    
-    Ms = [IDP_MASS_SEISMIC, 
-          IDP_MASS_GRANULATION, 
-          IDP_MASS_GRANULATION_CGBM, 
-          IDP_MASS_RHO_TRANSIT_CGBM] 
-    
-    Rs = [IDP_RADIUS_SEISMIC, 
-          IDP_RADIUS_GRANULATION_CGBM, 
-          IDP_RADIUS_RHO_TRANSIT, 
-          IDP_RADIUS_RHO_TRANSIT_CGBM]
-    
-    As = [IDP_AGE_SEISMIC, 
-          IDP_AGE_GYRO, 
-          IDP_AGE_ACTIVITY, 
-          IDP_AGE_GRANULATION_CGBM, 
-          IDP_AGE_RHO_TRANSIT_CGBM]
-    
-    M_select, R_select, A_select = selection(*Ms, *Rs, *As)
-    
+
+    Ms = [IDP_SAS_MASS_GRID_MIXED, 
+          IDP_SAS_MASS_GRID_SURF_IND, 
+          IDP_SAS_MASS_FREQS, 
+          IDP_SAS_MASS_SCALING_GRIDS, 
+          IDP_SAS_MASS_SCALING_ONLY, 
+          IDP_SAS_MASS_GRANULATION, 
+          IDP_SAS_MASS_GRANULATION_CGBM]
+
+    Rs = [IDP_SAS_RADIUS_GRID_MIXED, 
+          IDP_SAS_RADIUS_GRID_SURF_IND, 
+          IDP_SAS_RADIUS_FREQS, 
+          IDP_SAS_RADIUS_SCALING_GRIDS, 
+          IDP_SAS_RADIUS_SCALING_ONLY, 
+          IDP_SAS_RADIUS_GRANULATION_CGBM]
+
+    As = [IDP_SAS_AGE_GRID_MIXED, 
+          IDP_SAS_AGE_GRID_SURF_IND, 
+          IDP_SAS_AGE_FREQS, 
+          IDP_SAS_AGE_SCALING_GRIDS, 
+          IDP_SAS_AGE_GYRO, 
+          IDP_SAS_AGE_ACTIVITY, 
+          IDP_SAS_AGE_GRANULATION_CGBM]
+
     # compute means and stds 
     M_result = None
-    if M_select is not None:
-        M = Ms[M_names.index(M_select)]
-        M_result = (M.mean(), M.std(), M_select)
+    if IDP_SAS_MASS_PRIORITY is not None:
+        M = Ms[M_names.index(IDP_SAS_MASS_PRIORITY)]
+        mean, std = gumr(M.mean(), M.std())
+        M_result = (mean, std, IDP_SAS_MASS_PRIORITY)
+        #M_result = (M.mean(), M.std(), IDP_SAS_MASS_PRIORITY)
     
     R_result = None
-    if R_select is not None:
-        R = Rs[R_names.index(R_select)]
-        R_result = (R.mean(), R.std(), R_select)
+    if IDP_SAS_RADIUS_PRIORITY is not None:
+        R = Rs[R_names.index(IDP_SAS_RADIUS_PRIORITY)]
+        mean, std = gumr(R.mean(), R.std())
+        R_result = (mean, std, IDP_SAS_MASS_PRIORITY)
+        #R_result = (R.mean(), R.std(), IDP_SAS_RADIUS_PRIORITY)
     
     A_result = None
-    if A_select is not None:
-        A = As[A_names.index(A_select)]
-        A_result = (A.mean(), A.std(), A_select)
+    if IDP_SAS_AGE_PRIORITY is not None:
+        A = As[A_names.index(IDP_SAS_AGE_PRIORITY)]
+        mean, std = gumr(A.mean(), A.std())
+        A_result = (mean, std, IDP_SAS_MASS_PRIORITY)
+        #A_result = (A.mean(), A.std(), IDP_SAS_AGE_PRIORITY)
     
     results = [M_result, R_result, A_result]
     fail = [None, None, None]
@@ -111,3 +127,22 @@ def validation(IDP_MASS_SEISMIC=None,
             return fail
     
     return results
+
+def gumr(x_m, x_u):
+    """
+    Returns a correctly stated mean and standard deviation following 
+    the Guide for the Expression of Uncertainty in Measurement. 
+    """
+    # Truncate x_u to two significant digits
+    x_u_truncated = float(f"{x_u:.2g}")
+    
+    # Determine the number of digits after the decimal in x_u_truncated
+    if '.' in str(x_u_truncated):
+        decimal_places = len(str(x_u_truncated).split('.')[1])
+    else:
+        decimal_places = 0
+    
+    # Format x_m to match the number of digits after the decimal in x_u_truncated
+    x_m_formatted = f"{x_m:.{decimal_places}f}"
+    
+    return float(x_m_formatted), x_u_truncated
