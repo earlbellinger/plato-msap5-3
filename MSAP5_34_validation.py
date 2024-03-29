@@ -77,14 +77,14 @@ def validation(IDP_SAS_MASS_GRID_MIXED=None,
     if IDP_SAS_RADIUS_PRIORITY is not None:
         R = Rs[R_names.index(IDP_SAS_RADIUS_PRIORITY)]
         mean, std = gumr(R.mean(), R.std())
-        R_result = (mean, std, IDP_SAS_MASS_PRIORITY)
+        R_result = (mean, std, IDP_SAS_RADIUS_PRIORITY)
         #R_result = (R.mean(), R.std(), IDP_SAS_RADIUS_PRIORITY)
     
     A_result = None
     if IDP_SAS_AGE_PRIORITY is not None:
         A = As[A_names.index(IDP_SAS_AGE_PRIORITY)]
         mean, std = gumr(A.mean(), A.std())
-        A_result = (mean, std, IDP_SAS_MASS_PRIORITY)
+        A_result = (mean, std, IDP_SAS_AGE_PRIORITY)
         #A_result = (A.mean(), A.std(), IDP_SAS_AGE_PRIORITY)
     
     results = [M_result, R_result, A_result]
