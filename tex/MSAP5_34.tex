@@ -69,6 +69,8 @@
     Issue & Date & \textnumero{} change description & Page(s) & Paragraph(s) \\
     \midrule
     1.0 & March 4, 2023 & Initial release & All & All \\
+    1.1 & January 12, 2024 & Updated version & All & All \\
+    1.2 & March 4, 2024 & Added full seismic inputs & All & All \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -269,6 +271,8 @@ We find the model in the grid with the smallest $\chi^2$, defined as:
 Here $M, R, A$ are the mean values of the selected measurements provided by MSAP5-32; $\sigma_M, \sigma_R, \sigma_A$ are their standard deviations; and $\hat{M}, \hat{R}, \hat{A}$ are the theoretical values from the grid of models. 
 We then use \texttt{scipy 1.10.1} to compute the $\chi^2$ test statistic. 
 
+The module outputs None for each measurement if they are either inconsistent (from the previous module) or invalid (as determined by this module). 
+
 
 
 % TEXT FROM TEMPLATE BELOW IN emph OR itshape
@@ -320,26 +324,41 @@ The inputs are tabulated in Table~\ref{tab:input}.
     \toprule
     Name & Source & Status & Data type & Dimension & Unit \\
     \midrule
-    \iffalse
-    %x & x & mandatory/optional & x & x & x \\
-    IDP\_MASS   & IDP\_124/125 & optional & list of lists & arbitrary & M$_\odot$ \\
-    IDP\_RADIUS & IDP\_124/125 & optional & list of lists & arbitrary & R$_\odot$ \\
-    IDP\_AGE    & IDP\_124/125 & optional & list of lists & arbitrary & Gyr \\
-    %\iffalse%
-    \fi
-    IDP\_MASS\_SEISMIC              & IDP\_124 & optional & array & arbitrary & M$_\odot$ \\
-    IDP\_MASS\_GRANULATION          & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\
-    IDP\_MASS\_GRANULATION\_CGBM    & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\
-    IDP\_MASS\_RHO\_TRANSIT\_CGBM   & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\ \midrule
-    IDP\_RADIUS\_SEISMIC            & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\ 
-    IDP\_RADIUS\_GRANULATION\_CGBM  & IDP\_125 & optional & array & arbitrary & R$_\odot$ \\
-    IDP\_RADIUS\_RHO\_TRANSIT       & IDP\_125 & optional & array & arbitrary & R$_\odot$ \\ 
-    IDP\_RADIUS\_RHO\_TRANSIT\_CGBM & IDP\_125 & optional & array & arbitrary & R$_\odot$ \\ \midrule
-    IDP\_AGE\_SEISMIC               & IDP\_124 & optional & array & arbitrary & Gyr \\ 
-    IDP\_AGE\_GYRO                  & IDP\_125 & optional & array & arbitrary & Gyr \\
-    IDP\_AGE\_ACTIVITY              & IDP\_125 & optional & array & arbitrary & Gyr \\
-    IDP\_AGE\_GRANULATION\_CGBM     & IDP\_125 & optional & array & arbitrary & Gyr \\
-    IDP\_AGE\_RHO\_TRANSIT\_CGBM    & IDP\_125 & optional & array & arbitrary & Gyr \\ 
+    \midrule
+    IDP\_SAS\_AGE\_GYRO                  & IDP\_125 & optional & array & arbitrary & Gyr \\
+    IDP\_SAS\_AGE\_ACTIVITY              & IDP\_125 & optional & array & arbitrary & Gyr \\
+    IDP\_SAS\_MASS\_GRANULATION          & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_SAS\_MASS\_GRANULATION\_CGBM    & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_SAS\_RADIUS\_GRANULATION\_CGBM  & IDP\_125 & optional & array & arbitrary & R$_\odot$ \\
+    IDP\_SAS\_AGE\_GRANULATION\_CGBM     & IDP\_125 & optional & array & arbitrary & Gyr \\
+    %IDP\_SAS\_MASS\_RHO\_TRANSIT\_CGBM   & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\ 
+    %IDP\_SAS\_RADIUS\_RHO\_TRANSIT\_CGBM & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\
+    %IDP\_SAS\_AGE\_RHO\_TRANSIT\_CGBM    & IDP\_124 & optional & array & arbitrary & Gyr \\ 
+    \midrule 
+    IDP\_SAS\_MASS\_SCALING\_ONLY        & IDP\_124 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_SAS\_RADIUS\_SCALING\_ONLY      & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\
+    IDP\_SAS\_MASS\_SCALING\_GRIDS       & IDP\_124 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_SAS\_RADIUS\_SCALING\_GRIDS     & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\
+    IDP\_SAS\_AGE\_SCALING\_GRIDS        & IDP\_124 & optional & array & arbitrary & Gyr \\
+    IDP\_SAS\_MASS\_GRID\_MIXED          & IDP\_124 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_SAS\_RADIUS\_GRID\_MIXED        & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\
+    IDP\_SAS\_AGE\_GRID\_MIXED           & IDP\_124 & optional & array & arbitrary & Gyr \\
+    IDP\_SAS\_MASS\_GRID\_SURF\_IND      & IDP\_124 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_SAS\_RADIUS\_GRID\_SURF\_IND    & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\
+    IDP\_SAS\_AGE\_GRID\_SURF\_IND       & IDP\_124 & optional & array & arbitrary & Gyr \\
+    IDP\_SAS\_MASS\_FREQS                & IDP\_124 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_SAS\_RADIUS\_FREQS              & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\
+    IDP\_SAS\_AGE\_FREQS                 & IDP\_124 & optional & array & arbitrary & Gyr \\
+    \midrule 
+    IDP\_SAS\_METADATA\_SCALING\_ONLY        & IDP\_124 & optional & string & arbitrary &  \\
+    IDP\_SAS\_METADATA\_SCALING\_GRIDS       & IDP\_124 & optional & string & arbitrary &  \\
+    IDP\_SAS\_METADATA\_GRID\_MIXED          & IDP\_124 & optional & string & arbitrary &  \\
+    IDP\_SAS\_METADATA\_GRID\_SURF\_IND      & IDP\_124 & optional & string & arbitrary &  \\
+    IDP\_SAS\_METADATA\_GRID\_FREQS          & IDP\_124 & optional & string & arbitrary &  \\
+    \midrule
+    IDP\_SAS\_MASS\_PRIORITY & mandatory & string & 1 & N/A \\
+    IDP\_SAS\_RADIUS\_PRIORITY & mandatory & string & 1 & N/A \\
+    IDP\_SAS\_AGE\_PRIORITY & mandatory & string & 1 & N/A \\
     %\fi
     \bottomrule
   \end{tabular}
@@ -377,15 +396,15 @@ The inputs are tabulated in Table~\ref{tab:input}.
     Name & Status & Data type & Dimension & Unit \\
     \midrule
     %x & mandatory/optional & x & x & x \\
-    DP5\_125\_MASS & mandatory & float & 0 & M$_\odot$ \\
-    DP5\_125\_MASS\_STD & mandatory & float & 0 & M$_\odot$ \\
-    DP5\_125\_MASS\_METADATA & mandatory & string & 1 & N/A \\
-    DP5\_125\_RADIUS & mandatory & float & 0 & R$_\odot$ \\
-    DP5\_125\_RADIUS\_STD & mandatory & float & 0 & R$_\odot$ \\
-    DP5\_125\_RADIUS\_METADATA & mandatory & string & 1 & N/A \\
-    DP5\_125\_AGE & mandatory & float & 0 & Gyr \\
-    DP5\_125\_AGE\_STD & mandatory & float & 0 & Gyr \\
-    DP5\_125\_AGE\_METADATA & mandatory & string & 1 & N/A \\
+    DP5\_SAS\_MASS & mandatory & float & 0 & M$_\odot$ \\
+    DP5\_SAS\_MASS\_STD & mandatory & float & 0 & M$_\odot$ \\
+    DP5\_SAS\_MASS\_METADATA & mandatory & string & 1 & N/A \\
+    DP5\_SAS\_RADIUS & mandatory & float & 0 & R$_\odot$ \\
+    DP5\_SAS\_RADIUS\_STD & mandatory & float & 0 & R$_\odot$ \\
+    DP5\_SAS\_RADIUS\_METADATA & mandatory & string & 1 & N/A \\
+    DP5\_SAS\_AGE & mandatory & float & 0 & Gyr \\
+    DP5\_SAS\_AGE\_STD & mandatory & float & 0 & Gyr \\
+    DP5\_SAS\_AGE\_METADATA & mandatory & string & 1 & N/A \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -521,16 +540,15 @@ Case 1
       \firmlist
       \item All consistent measurements. 
       \item Inputs: Defaults
-      \item Outputs: [(0.9962651773334784, 0.03987402416784018, 'IDP\_MASS\_SEISMIC'), (1.0005801453727239, 0.010773401555852083, 'IDP\_RADIUS\_SEISMIC'), (4.523488989174997, 0.4577944489853377, 'IDP\_AGE\_SEISMIC')]
+      \item Outputs: [(1.0, 0.04, 'IDP\_SAS\_MASS\_GRID\_MIXED'), (0.999, 0.011, 'IDP\_SAS\_RADIUS\_GRID\_MIXED'), (4.6, 0.5, 'IDP\_SAS\_AGE\_GRID\_MIXED')]
   \end{itemize}
 
 Case 2
   \begin{itemize}
       \firmlist
       \item One inconsistent mass measurement. Additionally, in this case, the seismic radius measurement is missing.
-      \item Inputs: Defaults, except 1 is added to all the samples from the first mass method
-      \item Outputs: [None, \\
-                      (1.0001027661859054, 0.010833272851737678, 'IDP\_RADIUS\_GRANULATION\_CGBM'), \\(4.523488989174997, 0.4577944489853377, 'IDP\_AGE\_SEISMIC')]
+      \item Inputs: Defaults, except 1 is added to all the samples from the first mass method in order to artificially create an inconsistent measurement 
+      \item Outputs: [None, (1.0005, 0.0092, 'IDP\_SAS\_RADIUS\_GRID\_SURF\_IND'), (4.6, 0.5, 'IDP\_SAS\_AGE\_GRID\_MIXED')]
   \end{itemize}
 
 Case 3
@@ -538,9 +556,7 @@ Case 3
       \firmlist
       \item Two inconsistent radius measurements. Additionally, in this case, the seismic and granulation mass measurements are missing. 
       \item Inputs: Defaults, except $0.5$ is added to all the samples from the first radius method, and 1 is added to all the samples from the second radius method
-      \item Outputs: [(1.0019919549716714, 0.04171507064562778, 'IDP\_MASS\_GRANULATION\_CGBM'), \\
-                      None, \\
-                      (4.523488989174997, 0.4577944489853377, 'IDP\_AGE\_SEISMIC')]
+      \item Outputs: [(1.002, 0.042, 'IDP\_SAS\_MASS\_FREQS'), None, (4.6, 0.5, 'IDP\_SAS\_AGE\_GRID\_MIXED')]
   \end{itemize}
 
 Case 4
@@ -548,16 +564,14 @@ Case 4
       \firmlist
       \item Three inconsistent age measurements. 
       \item Inputs: Defaults, except $2,4,6$ are added to the first, second, third age methods 
-      \item Outputs: [(0.9962651773334784, 0.03987402416784018, 'IDP\_MASS\_SEISMIC'), \\
-                      (1.0005801453727239, 0.010773401555852083, 'IDP\_RADIUS\_SEISMIC'), \\
-                      None]
+      \item Outputs: [(1.0, 0.04, 'IDP\_SAS\_MASS\_GRID\_MIXED'), (0.999, 0.011, 'IDP\_SAS\_RADIUS\_GRID\_MIXED'), None]
   \end{itemize}
 
 Case 5
 \begin{itemize}
     \firmlist
     \item Consistent but invalid measurements. 
-     \item Inputs: Defaults, except the radii are 10 solar masses larger 
+     \item Inputs: Defaults, except the radii are 10 solar radii larger 
      \item Outputs: [None, None, None]
 \end{itemize}
 

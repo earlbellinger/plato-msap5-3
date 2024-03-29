@@ -45,7 +45,7 @@
     \toprule
     Prepared by & Date\\
     \midrule
-    Earl P. Bellinger & March 4, 2023 \\
+    Earl P.\ Bellinger & March 4, 2023 \\
     \\
     Checked by \\
     \midrule
@@ -71,6 +71,8 @@
     Issue & Date & \textnumero{} change description & Page(s) & Paragraph(s) \\
     \midrule
     1.0 & March 4, 2023 & Initial release & All & All \\
+    1.1 & January 12, 2024 & Updated version & All & All \\
+    1.2 & March 4, 2024 & Added full seismic inputs & All & All \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -270,6 +272,9 @@ Each input is an array containing samples from the posterior distribution accord
 The algorithm then computes the HSD on the inputs, and reports whether any of the measurements are inconsistent at a significance level of $0.05$. 
 The implementation of HSD used here is from \texttt{scipy 1.10.1}. 
 
+In the next iteration, this module will be adapted to receive reliability flags from each of the measurement types. 
+Any measurement deemed unreliable will not be used in subsequent processing. 
+
 
 % TEXT FROM TEMPLATE BELOW IN emph OR itshape
 %\emph{Please provide here a short description of the main steps of the algorithm}
@@ -317,26 +322,36 @@ The inputs are tabulated in Table~\ref{tab:input}.
     \toprule
     Name & Source & Status & Data type & Dimension & Unit \\
     \midrule
-    \iffalse
-    %x & x & mandatory/optional & x & x & x \\
-    IDP\_MASS   & IDP\_124/125 & optional & list of lists & arbitrary & M$_\odot$ \\
-    IDP\_RADIUS & IDP\_124/125 & optional & list of lists & arbitrary & R$_\odot$ \\
-    IDP\_AGE    & IDP\_124/125 & optional & list of lists & arbitrary & Gyr \\
-    %\iffalse%
-    \fi
-    IDP\_MASS\_SEISMIC              & IDP\_124 & optional & array & arbitrary & M$_\odot$ \\
-    IDP\_MASS\_GRANULATION          & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\
-    IDP\_MASS\_GRANULATION\_CGBM    & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\
-    IDP\_MASS\_RHO\_TRANSIT\_CGBM   & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\ \midrule
-    IDP\_RADIUS\_SEISMIC            & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\ 
-    IDP\_RADIUS\_GRANULATION\_CGBM  & IDP\_125 & optional & array & arbitrary & R$_\odot$ \\
-    IDP\_RADIUS\_RHO\_TRANSIT\_CGBM & IDP\_125 & optional & array & arbitrary & R$_\odot$ \\ \midrule
-    IDP\_AGE\_SEISMIC               & IDP\_124 & optional & array & arbitrary & Gyr \\ 
-    IDP\_AGE\_GYRO                  & IDP\_125 & optional & array & arbitrary & Gyr \\
-    IDP\_AGE\_ACTIVITY              & IDP\_125 & optional & array & arbitrary & Gyr \\
-    IDP\_AGE\_GRANULATION\_CGBM     & IDP\_125 & optional & array & arbitrary & Gyr \\
-    IDP\_AGE\_RHO\_TRANSIT\_CGBM    & IDP\_125 & optional & array & arbitrary & Gyr \\ 
-    %\fi
+    IDP\_SAS\_AGE\_GYRO                  & IDP\_125 & optional & array & arbitrary & Gyr \\
+    IDP\_SAS\_AGE\_ACTIVITY              & IDP\_125 & optional & array & arbitrary & Gyr \\
+    IDP\_SAS\_MASS\_GRANULATION          & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_SAS\_MASS\_GRANULATION\_CGBM    & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_SAS\_RADIUS\_GRANULATION\_CGBM  & IDP\_125 & optional & array & arbitrary & R$_\odot$ \\
+    IDP\_SAS\_AGE\_GRANULATION\_CGBM     & IDP\_125 & optional & array & arbitrary & Gyr \\
+    %IDP\_SAS\_MASS\_RHO\_TRANSIT\_CGBM   & IDP\_125 & optional & array & arbitrary & M$_\odot$ \\ 
+    %IDP\_SAS\_RADIUS\_RHO\_TRANSIT\_CGBM & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\
+    %IDP\_SAS\_AGE\_RHO\_TRANSIT\_CGBM    & IDP\_124 & optional & array & arbitrary & Gyr \\ 
+    \midrule 
+    IDP\_SAS\_MASS\_SCALING\_ONLY        & IDP\_124 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_SAS\_RADIUS\_SCALING\_ONLY      & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\
+    IDP\_SAS\_MASS\_SCALING\_GRIDS       & IDP\_124 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_SAS\_RADIUS\_SCALING\_GRIDS     & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\
+    IDP\_SAS\_AGE\_SCALING\_GRIDS        & IDP\_124 & optional & array & arbitrary & Gyr \\
+    IDP\_SAS\_MASS\_GRID\_MIXED          & IDP\_124 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_SAS\_RADIUS\_GRID\_MIXED        & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\
+    IDP\_SAS\_AGE\_GRID\_MIXED           & IDP\_124 & optional & array & arbitrary & Gyr \\
+    IDP\_SAS\_MASS\_GRID\_SURF\_IND      & IDP\_124 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_SAS\_RADIUS\_GRID\_SURF\_IND    & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\
+    IDP\_SAS\_AGE\_GRID\_SURF\_IND       & IDP\_124 & optional & array & arbitrary & Gyr \\
+    IDP\_SAS\_MASS\_FREQS                & IDP\_124 & optional & array & arbitrary & M$_\odot$ \\
+    IDP\_SAS\_RADIUS\_FREQS              & IDP\_124 & optional & array & arbitrary & R$_\odot$ \\
+    IDP\_SAS\_AGE\_FREQS                 & IDP\_124 & optional & array & arbitrary & Gyr \\
+    \midrule 
+    IDP\_SAS\_METADATA\_SCALING\_ONLY        & IDP\_124 & optional & string & arbitrary &  \\
+    IDP\_SAS\_METADATA\_SCALING\_GRIDS       & IDP\_124 & optional & string & arbitrary &  \\
+    IDP\_SAS\_METADATA\_GRID\_MIXED          & IDP\_124 & optional & string & arbitrary &  \\
+    IDP\_SAS\_METADATA\_GRID\_SURF\_IND      & IDP\_124 & optional & string & arbitrary &  \\
+    IDP\_SAS\_METADATA\_GRID\_FREQS          & IDP\_124 & optional & string & arbitrary &  \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -368,14 +383,15 @@ The inputs are tabulated in Table~\ref{tab:input}.
   \centering
   \caption{Output parameters}
   \label{tab:output}
-  \begin{tabular}{ccccc}
+  \begin{tabular}{lcccc}
     \toprule
     Name & Status & Data type & Dimension & Unit \\
     \midrule
     %x & mandatory/optional & x & x & x \\
-    M consistency flag & mandatory & boolean & bit & true/false \\
-    R consistency flag & mandatory & boolean & bit & true/false \\
-    A consistency flag & mandatory & boolean & bit & true/false \\
+    IDP\_SAS\_CONSISTENCY\_FLAGS             & MSAP5\_31 & boolean array & 3 &  \\
+    %IDP\_SAS\_CONSISTENCY\_FLAG\_MASS & mandatory & boolean & bit & true/false \\
+    %IDP\_SAS\_CONSISTENCY\_FLAG\_RADIUS & mandatory & boolean & bit & true/false \\
+    %IDP\_SAS\_CONSISTENCY\_FLAG\_AGE & mandatory & boolean & bit & true/false \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -421,7 +437,8 @@ Prototype
 \label{sec:mature}
 
 Algorithm concept defined, but interfaces (inputs/outputs) unstable. 
-Has been tested with randomly-generated pseudo inputs, but needs to be tested with actual inputs from all of the PLATO modules. The complete list of seismic inputs needs to be added. 
+Has been tested with randomly-generated pseudo inputs, but needs to be tested with actual inputs from all of the PLATO modules. 
+%The complete list of seismic inputs needs to be added. 
 
 % TEXT FROM TEMPLATE BELOW IN emph OR itshape
 \iffalse
@@ -541,7 +558,7 @@ Case 5
 \begin{itemize}
     \firmlist
     \item Consistent but invalid measurements. 
-     \item Inputs: Defaults, except the radii are 10 solar masses larger 
+     \item Inputs: Defaults, except the radii are 10 solar radii larger 
      \item Outputs: [True, True, True]
 \end{itemize}
 
